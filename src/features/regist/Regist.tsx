@@ -3,11 +3,22 @@ import {useRef} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import './Regist.css'
+import { useTodoStore } from 'store/store';
+
 
 const Regist = () => {
   const title = useRef<HTMLInputElement>(null);
   const content = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  const makeTodoItem: () => TodoInfoItem = () => {
+    return {
+      title: title.current?.value,
+      content: content.current?.value,
+      done: false,
+    } 
+  }
+  const todoStore = useTodoStore()
+  
   // const content = useRef('')
   const handleRegist = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // 등록하기
@@ -20,17 +31,7 @@ const Regist = () => {
     else {
       const shouldRegister = window.confirm("할 일을 등록하시겠습니까?")  // axios post
       if (shouldRegister){
-        try {
-          await axios.post("http://localhost:33088/api/todolist", {
-            title: title.current,
-            content: content.current,
-            done: false,
-          });
-          alert("할 일이 등록되었습니다.");
-          //window.location.replace("/");
-        } catch (err) {
-          console.log(err);
-        }
+        todoStore.registerTodoItem(makeTodoItem()) 
       }
       else {
         alert("등록을 취소하였습니다.");
